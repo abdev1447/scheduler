@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · Scheduler{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <section class="card dashboard__main" id="upcoming">
+    <h1 class="card__title">Upcoming events</h1>
+    {% if upcoming %}
+    <ul class="event-list">
+      {% for event in upcoming %}{% include "_event_item.html" %}{% endfor %}
+    </ul>
+    {% endif %}
+    <div class="actions">
+      <a class="button button--primary" id="add-event" href="{{ url_for('events.new_event') }}">+ Add event</a>
+      {% if has_past %}
+      <a class="button button--secondary" id="past-events" href="{{ url_for('events.past_events') }}">Past events</a>
+      {% endif %}
+    </div>
+  </section>
+
+  <aside class="dashboard__side">
+    <div class="card calendar" id="calendar">
+      <h2 class="card__title">{{ calendar.title }}</h2>
+      <table class="calendar__grid">
+        <thead>
+          <tr>{% for name in calendar.weekdays %}<th scope="col">{{ name }}</th>{% endfor %}</tr>
+        </thead>
+        <tbody>
+          {% for week in calendar.weeks %}
+          <tr>
+            {% for day in week %}
+            <td class="calendar__day{% if day.today %} calendar__day--today{% endif %}{% if not day.in_month %} calendar__day--outside{% endif %}{% if day.has_event %} calendar__day--event{% endif %}" data-date="{{ day.date.isoformat() }}">{{ day.date.day }}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="legend">
+        <span><span class="legend__dot legend__dot--personal"></span>Personal</span>
+        <span><span class="legend__dot legend__dot--professional"></span>Professional</span>
+      </div>
+    </div>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Past events · Scheduler{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1 class="card__title">Past events</h1>
+  {% if events %}
+  <ul class="event-list event-list--past">
+    {% for event in events %}{% include "_event_item.html" %}{% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">There are no past events.</p>
+  {% endif %}
+  <div class="actions">
+    <a class="button button--secondary" href="{{ url_for('events.dashboard') }}">&larr; Back to dashboard</a>
+  </div>
+</section>
+{% endblock %}
