@@ -15,9 +15,10 @@ def create_app(test_config=None):
 
     os.makedirs(app.instance_path, exist_ok=True)
 
-    from . import db, events
+    from . import db, events, theme
 
     db.init_app(app)
     app.register_blueprint(events.bp)
+    app.register_blueprint(theme.bp)
 
     return app

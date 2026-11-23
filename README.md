@@ -20,6 +20,10 @@ events (personal and professional are colour-coded), shows this month's
 calendar on the right, and has "Add event" and (when there are past events)
 "Past events" buttons.
 
+The "Dark view" / "Light view" button in the top right switches the colour
+theme. The choice is kept in a browser cookie, so it stays the same on every
+page and the next time you visit. Light view is the default.
+
 Events are stored in an SQLite file at `instance/scheduler.sqlite`, created
 automatically on first start. Delete that file to start again with no events.
 
