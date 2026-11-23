@@ -20,6 +20,12 @@ events (personal and professional are colour-coded), shows this month's
 calendar on the right, and has "Add event" and (when there are past events)
 "Past events" buttons.
 
+Click any event, upcoming or past, to open its details page (`/events/<id>`):
+title, type, whether it is upcoming or past, date, time, location and
+description. Location and description are optional fields in the "Add event"
+form. Databases created before these fields existed are upgraded automatically
+on start; their old events show "Not given" / "No description".
+
 Use the ‹ and › buttons above the calendar to move to the previous or next
 month; days with events are marked in every month. When you are away from the
 current month, a "Today" button takes you back. The shown month is part of the

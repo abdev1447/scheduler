@@ -1,14 +1,18 @@
 <li class="event event--{{ event.category }}">
-  <div class="event__date">
-    <span class="event__month">{{ event.day.strftime('%b') }}</span>
-    <span class="event__daynum">{{ event.day.day }}</span>
-  </div>
-  <div class="event__body">
-    <p class="event__title">{{ event.title }}</p>
-    <p class="event__meta">
-      {{ event.day.strftime('%A, %d %B %Y') }} &middot;
-      {% if event.at %}{{ event.at.strftime('%H:%M') }}{% else %}All day{% endif %}
-    </p>
-  </div>
-  <span class="badge badge--{{ event.category }}">{{ event.category | capitalize }}</span>
+  <a class="event__link" href="{{ url_for('events.event_details', event_id=event.id) }}" title="Show all details">
+    <div class="event__date">
+      <span class="event__month">{{ event.day.strftime('%b') }}</span>
+      <span class="event__daynum">{{ event.day.day }}</span>
+    </div>
+    <div class="event__body">
+      <p class="event__title">{{ event.title }}</p>
+      <p class="event__meta">
+        {{ event.day.strftime('%A, %d %B %Y') }} &middot;
+        {% if event.at %}{{ event.at.strftime('%H:%M') }}{% else %}All day{% endif %}
+        {% if event.location %}&middot; {{ event.location }}{% endif %}
+      </p>
+    </div>
+    <span class="badge badge--{{ event.category }}">{{ event.category | capitalize }}</span>
+    <span class="event__chevron" aria-hidden="true">&#8250;</span>
+  </a>
 </li>

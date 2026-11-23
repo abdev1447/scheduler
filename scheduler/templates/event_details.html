@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }} · Scheduler{% endblock %}
+{% block content %}
+<section class="card narrow event-details event-details--{{ event.category }}" id="event-details">
+  <div class="event-details__header">
+    <h1 class="card__title event-details__title">{{ event.title }}</h1>
+    <span class="badge badge--{{ event.category }}">{{ event.category | capitalize }}</span>
+  </div>
+  <dl class="details">
+    <dt>Status</dt>
+    <dd><span class="status status--{{ 'past' if past else 'upcoming' }}">{{ 'Past' if past else 'Upcoming' }}</span></dd>
+    <dt>Type</dt>
+    <dd>{{ event.category | capitalize }}</dd>
+    <dt>Date</dt>
+    <dd>{{ event.day.strftime('%A, %d %B %Y') }}</dd>
+    <dt>Time</dt>
+    <dd>{% if event.at %}{{ event.at.strftime('%H:%M') }}{% else %}All day{% endif %}</dd>
+    <dt>Location</dt>
+    <dd>{% if event.location %}{{ event.location }}{% else %}<span class="muted">Not given</span>{% endif %}</dd>
+    <dt>Description</dt>
+    <dd class="details__text">{% if event.description %}{{ event.description }}{% else %}<span class="muted">No description</span>{% endif %}</dd>
+  </dl>
+  <div class="actions">
+    {% if past %}
+    <a class="button button--secondary" id="back" href="{{ url_for('events.past_events') }}">&larr; Back to past events</a>
+    {% else %}
+    <a class="button button--secondary" id="back" href="{{ url_for('events.dashboard') }}">&larr; Back to dashboard</a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

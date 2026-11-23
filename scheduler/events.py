@@ -2,7 +2,7 @@ import calendar
 import re
 from datetime import MAXYEAR, MINYEAR, date, datetime, time
 
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, abort, redirect, render_template, request, url_for
 
 from .db import get_db
 
@@ -11,18 +11,21 @@ bp = Blueprint("events", __name__)
 CATEGORIES = ("personal", "professional")
 
 
+COLUMNS = "id, title, date, time, category, location, description"
+
+
+def to_event(row):
+    day = date.fromisoformat(row["date"])
+    at = time.fromisoformat(row["time"]) if row["time"] else None
+    return {**dict(row), "day": day, "at": at}
+
+
 def load_events():
     """Return all events as dicts, sorted by date and time (all-day events first)."""
     rows = get_db().execute(
-        "SELECT id, title, date, time, category FROM event"
-        " ORDER BY date, time IS NOT NULL, time, id"
+        f"SELECT {COLUMNS} FROM event ORDER BY date, time IS NOT NULL, time, id"
     ).fetchall()
-    events = []
-    for row in rows:
-        day = date.fromisoformat(row["date"])
-        at = time.fromisoformat(row["time"]) if row["time"] else None
-        events.append({**dict(row), "day": day, "at": at})
-    return events
+    return [to_event(row) for row in rows]
 
 
 def is_past(event, now):
@@ -121,6 +124,15 @@ def past_events():
     return render_template("past_events.html", events=past)
 
 
+@bp.route("/events/<int:event_id>")
+def event_details(event_id):
+    row = get_db().execute(f"SELECT {COLUMNS} FROM event WHERE id = ?", (event_id,)).fetchone()
+    if row is None:
+        abort(404)
+    event = to_event(row)
+    return render_template("event_details.html", event=event, past=is_past(event, datetime.now()))
+
+
 def validate(form):
     errors = []
     title = form.get("title", "").strip()
@@ -149,12 +161,15 @@ def new_event():
             return render_template("event_form.html", errors=errors, form=request.form), 400
         db = get_db()
         db.execute(
-            "INSERT INTO event (title, date, time, category) VALUES (?, ?, ?, ?)",
+            "INSERT INTO event (title, date, time, category, location, description)"
+            " VALUES (?, ?, ?, ?, ?, ?)",
             (
                 request.form["title"].strip(),
                 date.fromisoformat(request.form["date"]).isoformat(),
                 request.form.get("time", "").strip() or None,
                 request.form["category"],
+                request.form.get("location", "").strip() or None,
+                request.form.get("description", "").strip() or None,
             ),
         )
         db.commit()

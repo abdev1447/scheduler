@@ -8,9 +8,14 @@ CREATE TABLE IF NOT EXISTS event (
     title TEXT NOT NULL,
     date TEXT NOT NULL,          -- YYYY-MM-DD
     time TEXT,                   -- HH:MM, or NULL for an all-day event
-    category TEXT NOT NULL CHECK (category IN ('personal', 'professional'))
+    category TEXT NOT NULL CHECK (category IN ('personal', 'professional')),
+    location TEXT,               -- optional
+    description TEXT             -- optional
 );
 """
+
+# Columns added after the first release; older database files get them on start.
+ADDED_COLUMNS = {"location": "TEXT", "description": "TEXT"}
 
 
 def get_db():
@@ -31,5 +36,9 @@ def init_app(app):
     """Create the tables if needed and close the connection after each request."""
     with sqlite3.connect(app.config["DATABASE"]) as conn:
         conn.executescript(SCHEMA)
+        existing = {row[1] for row in conn.execute("PRAGMA table_info(event)")}
+        for name, kind in ADDED_COLUMNS.items():
+            if name not in existing:
+                conn.execute(f"ALTER TABLE event ADD COLUMN {name} {kind}")
     conn.close()
     app.teardown_appcontext(close_db)

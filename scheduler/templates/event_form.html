@@ -23,6 +23,12 @@
       </div>
     </div>
 
+    <label for="location">Location <span class="muted">(optional)</span></label>
+    <input id="location" name="location" type="text" value="{{ form.get('location', '') }}">
+
+    <label for="description">Description <span class="muted">(optional)</span></label>
+    <textarea id="description" name="description" rows="4">{{ form.get('description', '') }}</textarea>
+
     <fieldset>
       <legend>Type</legend>
       {% set chosen = form.get('category', 'personal') %}
