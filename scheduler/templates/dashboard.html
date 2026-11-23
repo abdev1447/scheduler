@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · Scheduler{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <section class="card dashboard__main" id="upcoming">
+    <h1 class="card__title">Upcoming events</h1>
+    {% if upcoming %}
+    <ul class="event-list">
+      {% for event in upcoming %}{% include "_event_item.html" %}{% endfor %}
+    </ul>
+    {% endif %}
+    <div class="actions">
+      <a class="button button--primary" id="add-event" href="{{ url_for('events.new_event') }}">+ Add event</a>
+      {% if has_past %}
+      <a class="button button--secondary" id="past-events" href="{{ url_for('events.past_events') }}">Past events</a>
+      {% endif %}
+    </div>
+  </section>
+
+  <aside class="dashboard__side">
+    <div class="card calendar" id="calendar">
+      <div class="calendar__header">
+        <h2 class="card__title calendar__title">{{ calendar.title }}</h2>
+        <nav class="calendar__nav" aria-label="Change month">
+          {% if not calendar.is_current %}
+          <a class="calendar__nav-button calendar__nav-button--today" id="calendar-today" href="{{ url_for('events.dashboard') }}">Today</a>
+          {% endif %}
+          {% if calendar.prev %}
+          <a class="calendar__nav-button" id="calendar-prev" href="{{ url_for('events.dashboard', month=calendar.prev) }}" aria-label="Previous month" title="Previous month">&#8249;</a>
+          {% else %}
+          <span class="calendar__nav-button calendar__nav-button--disabled" aria-hidden="true">&#8249;</span>
+          {% endif %}
+          {% if calendar.next %}
+          <a class="calendar__nav-button" id="calendar-next" href="{{ url_for('events.dashboard', month=calendar.next) }}" aria-label="Next month" title="Next month">&#8250;</a>
+          {% else %}
+          <span class="calendar__nav-button calendar__nav-button--disabled" aria-hidden="true">&#8250;</span>
+          {% endif %}
+        </nav>
+      </div>
+      <table class="calendar__grid">
+        <thead>
+          <tr>{% for name in calendar.weekdays %}<th scope="col">{{ name }}</th>{% endfor %}</tr>
+        </thead>
+        <tbody>
+          {% for week in calendar.weeks %}
+          <tr>
+            {% for day in week %}
+            {% if day is none %}
+            <td class="calendar__day calendar__day--outside"></td>
+            {% else %}
+            <td class="calendar__day{% if day.today %} calendar__day--today{% endif %}{% if not day.in_month %} calendar__day--outside{% endif %}{% if day.has_event %} calendar__day--event{% endif %}" data-date="{{ day.date.isoformat() }}">{{ day.date.day }}</td>
+            {% endif %}
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="legend">
+        <span><span class="legend__dot legend__dot--personal"></span>Personal</span>
+        <span><span class="legend__dot legend__dot--professional"></span>Professional</span>
+      </div>
+    </div>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Add event · Scheduler{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1 class="card__title">Add event</h1>
+  {% if errors %}
+  <ul class="errors" role="alert">
+    {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  <form method="post" class="form">
+    <label for="title">Title</label>
+    <input id="title" name="title" type="text" required value="{{ form.get('title', '') }}">
+
+    <div class="form__row">
+      <div>
+        <label for="date">Date</label>
+        <input id="date" name="date" type="date" required value="{{ form.get('date', '') }}">
+      </div>
+      <div>
+        <label for="time">Time <span class="muted">(optional)</span></label>
+        <input id="time" name="time" type="time" value="{{ form.get('time', '') }}">
+      </div>
+    </div>
+
+    <label for="location">Location <span class="muted">(optional)</span></label>
+    <input id="location" name="location" type="text" value="{{ form.get('location', '') }}">
+
+    <label for="description">Description <span class="muted">(optional)</span></label>
+    <textarea id="description" name="description" rows="4">{{ form.get('description', '') }}</textarea>
+
+    <fieldset>
+      <legend>Type</legend>
+      {% set chosen = form.get('category', 'personal') %}
+      <label class="choice choice--personal">
+        <input type="radio" name="category" value="personal" {% if chosen == 'personal' %}checked{% endif %}> Personal
+      </label>
+      <label class="choice choice--professional">
+        <input type="radio" name="category" value="professional" {% if chosen == 'professional' %}checked{% endif %}> Professional
+      </label>
+    </fieldset>
+
+    <div class="actions">
+      <button class="button button--primary" type="submit">Save event</button>
+      <a class="button button--secondary" href="{{ url_for('events.dashboard') }}">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}
