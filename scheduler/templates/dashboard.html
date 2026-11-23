@@ -19,7 +19,24 @@
 
   <aside class="dashboard__side">
     <div class="card calendar" id="calendar">
-      <h2 class="card__title">{{ calendar.title }}</h2>
+      <div class="calendar__header">
+        <h2 class="card__title calendar__title">{{ calendar.title }}</h2>
+        <nav class="calendar__nav" aria-label="Change month">
+          {% if not calendar.is_current %}
+          <a class="calendar__nav-button calendar__nav-button--today" id="calendar-today" href="{{ url_for('events.dashboard') }}">Today</a>
+          {% endif %}
+          {% if calendar.prev %}
+          <a class="calendar__nav-button" id="calendar-prev" href="{{ url_for('events.dashboard', month=calendar.prev) }}" aria-label="Previous month" title="Previous month">&#8249;</a>
+          {% else %}
+          <span class="calendar__nav-button calendar__nav-button--disabled" aria-hidden="true">&#8249;</span>
+          {% endif %}
+          {% if calendar.next %}
+          <a class="calendar__nav-button" id="calendar-next" href="{{ url_for('events.dashboard', month=calendar.next) }}" aria-label="Next month" title="Next month">&#8250;</a>
+          {% else %}
+          <span class="calendar__nav-button calendar__nav-button--disabled" aria-hidden="true">&#8250;</span>
+          {% endif %}
+        </nav>
+      </div>
       <table class="calendar__grid">
         <thead>
           <tr>{% for name in calendar.weekdays %}<th scope="col">{{ name }}</th>{% endfor %}</tr>
@@ -28,7 +45,11 @@
           {% for week in calendar.weeks %}
           <tr>
             {% for day in week %}
+            {% if day is none %}
+            <td class="calendar__day calendar__day--outside"></td>
+            {% else %}
             <td class="calendar__day{% if day.today %} calendar__day--today{% endif %}{% if not day.in_month %} calendar__day--outside{% endif %}{% if day.has_event %} calendar__day--event{% endif %}" data-date="{{ day.date.isoformat() }}">{{ day.date.day }}</td>
+            {% endif %}
             {% endfor %}
           </tr>
           {% endfor %}

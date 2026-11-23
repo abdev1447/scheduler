@@ -20,6 +20,12 @@ events (personal and professional are colour-coded), shows this month's
 calendar on the right, and has "Add event" and (when there are past events)
 "Past events" buttons.
 
+Use the ‹ and › buttons above the calendar to move to the previous or next
+month; days with events are marked in every month. When you are away from the
+current month, a "Today" button takes you back. The shown month is part of the
+address (for example `/?month=2027-03`), so it can be bookmarked; an invalid
+value shows the current month.
+
 The "Dark view" / "Light view" button in the top right switches the colour
 theme. The choice is kept in a browser cookie, so it stays the same on every
 page and the next time you visit. Light view is the default.

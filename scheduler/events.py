@@ -1,5 +1,6 @@
 import calendar
-from datetime import date, datetime, time
+import re
+from datetime import MAXYEAR, MINYEAR, date, datetime, time
 
 from flask import Blueprint, redirect, render_template, request, url_for
 
@@ -38,23 +39,66 @@ def split_events(events, now):
     return upcoming, past
 
 
-def month_calendar(today, event_days):
-    """Weeks of the current month for the calendar widget."""
+def parse_month(value):
+    """Turn a "YYYY-MM" query value into (year, month), or None if invalid."""
+    match = re.fullmatch(r"(\d{4})-(\d{2})", value or "")
+    if not match:
+        return None
+    year, month = int(match.group(1)), int(match.group(2))
+    if not (MINYEAR <= year <= MAXYEAR and 1 <= month <= 12):
+        return None
+    return year, month
+
+
+def shift_month(year, month, delta):
+    """The (year, month) `delta` months away, or None if outside the date range."""
+    index = year * 12 + month - 1 + delta
+    year, month = divmod(index, 12)
+    if not MINYEAR <= year <= MAXYEAR:
+        return None
+    return year, month + 1
+
+
+def month_param(year_month):
+    return f"{year_month[0]:04d}-{year_month[1]:02d}" if year_month else None
+
+
+def calendar_dates(year, month):
+    """Full weeks (Monday first) covering the month. The stdlib helper fails at
+    the very first and last supported months, so pad those weeks by hand."""
+    first = date(year, month, 1)
+    start = first.toordinal() - first.weekday()
+    last = date(year, month, calendar.monthrange(year, month)[1])
+    end = last.toordinal() + 6 - last.weekday()
+    days = [
+        date.fromordinal(n) if date.min.toordinal() <= n <= date.max.toordinal() else None
+        for n in range(start, end + 1)
+    ]
+    return [days[i:i + 7] for i in range(0, len(days), 7)]
+
+
+def month_calendar(today, event_days, shown=None):
+    """Weeks of the shown month (default: today's month) for the calendar widget."""
+    year, month = shown or (today.year, today.month)
     weeks = []
-    for week in calendar.Calendar(firstweekday=0).monthdatescalendar(today.year, today.month):
+    for week in calendar_dates(year, month):
         weeks.append([
-            {
+            None if day is None else {
                 "date": day,
-                "in_month": day.month == today.month,
+                "in_month": day.month == month,
                 "today": day == today,
                 "has_event": day in event_days,
             }
             for day in week
         ])
+    is_current = (year, month) == (today.year, today.month)
     return {
-        "title": today.strftime("%B %Y"),
+        "title": f"{calendar.month_name[month]} {year}",
         "weekdays": [calendar.day_abbr[i][:2] for i in range(7)],
         "weeks": weeks,
+        "prev": month_param(shift_month(year, month, -1)),
+        "next": month_param(shift_month(year, month, 1)),
+        "is_current": is_current,
     }
 
 
@@ -63,7 +107,8 @@ def dashboard():
     now = datetime.now()
     events = load_events()
     upcoming, past = split_events(events, now)
-    cal = month_calendar(now.date(), {e["day"] for e in events})
+    shown = parse_month(request.args.get("month"))
+    cal = month_calendar(now.date(), {e["day"] for e in events}, shown)
     return render_template(
         "dashboard.html", upcoming=upcoming, has_past=bool(past), calendar=cal
     )

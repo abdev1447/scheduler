@@ -210,6 +210,46 @@ body {
 .button--secondary:hover { background: var(--bg); }
 
 /* Calendar */
+.calendar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.calendar__title { margin: 0; }
+
+.calendar__nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calendar__nav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  background: var(--surface);
+  font-size: 20px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.calendar__nav-button:hover { background: var(--bg); border-color: var(--brand); color: var(--brand); }
+
+.calendar__nav-button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.calendar__nav-button--today { font-size: 13px; font-weight: 600; }
+
+.calendar__nav-button--disabled { color: var(--outside); pointer-events: none; }
+
 .calendar__grid {
   width: 100%;
   border-collapse: collapse;
